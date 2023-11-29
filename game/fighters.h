@@ -21,7 +21,7 @@ enum struct Hit
     NONE,
     HAND,
     LEG
-}
+};
 
 struct Fighter1
 {
@@ -62,9 +62,9 @@ struct Fighter2
 };
 
 void initializeFighter1(Fighter1 &fighter1);
-void updateFighter1(Fighter1 &fighter1, float elapsedTime);
+void updateFighter1(Fighter1 &fighter1, float elapsedTime, int WINDOW_WIDTH);
 
 void initializeFighter2(Fighter2 &fighter2);
-void updateFighter2(Fighter2 &fighter2, float elapsedTime);
+void updateFighter2(Fighter2 &fighter2, float elapsedTime, int WINDOW_WIDTH);
 
 void drawFighters(sf::RenderWindow &window, Fighter1 &fighter1, Fighter2 &fighter2);

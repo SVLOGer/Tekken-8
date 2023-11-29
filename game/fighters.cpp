@@ -241,14 +241,23 @@ void initializeFighter2(Fighter2 &fighter2)
     fighter2.hp = 100;
 }
 
-void updateFighter1(Fighter1 &fighter1, float elapsedTime)
+void updateFighter1(Fighter1 &fighter1, float elapsedTime, int WINDOW_WIDTH)
 {
-    const float step = fighter1.speed * elapsedTime;
+    sf::Vector2f fighter1Pos = fighter1.sprite.getPosition();
+    float step = fighter1.speed * elapsedTime;
 
     bool isFighterStayY = false;
     bool isFighterStayX = false;
 
-    updateFighter1Direction(fighter1);
+    if (fighter1.hit == Hit::NONE)
+    {
+        updateFighter1Direction(fighter1);
+    }
+    else
+    {
+        fighter1.dirX = DirectionX::NONE;
+        fighter1.dirY = DirectionY::NONE;
+    }
     updateFighter1Sprite(fighter1);
 
     sf::Vector2f movement(0.f, 0.f);
@@ -275,11 +284,25 @@ void updateFighter1(Fighter1 &fighter1, float elapsedTime)
     switch (fighter1.dirX)
     {
     case DirectionX::LEFT:
-        movement.x -= step;
+        if (fighter1Pos.x - step < 135)
+        {
+            movement.x = 0;
+        }
+        else
+        {
+            movement.x -= step;
+        }
         fighter1.animationTimer += elapsedTime;
         break;
     case DirectionX::RIGHT:
-        movement.x += step;
+        if (fighter1Pos.x + step > WINDOW_WIDTH - 135)
+        {
+            movement.x = 0;
+        }
+        else
+        {
+            movement.x += step;
+        }
         fighter1.animationTimer += elapsedTime;
         break;
     case DirectionX::NONE:
@@ -293,14 +316,23 @@ void updateFighter1(Fighter1 &fighter1, float elapsedTime)
     fighter1.sprite.move(movement);
 }
 
-void updateFighter2(Fighter2 &fighter2, float elapsedTime)
+void updateFighter2(Fighter2 &fighter2, float elapsedTime, int WINDOW_WIDTH)
 {
+    sf::Vector2f fighter2Pos = fighter2.sprite.getPosition();
     const float step = fighter2.speed * elapsedTime;
 
     bool isFighterStayY = false;
     bool isFighterStayX = false;
 
-    updateFighter2Direction(fighter2);
+    if (fighter2.hit == Hit::NONE)
+    {
+        updateFighter2Direction(fighter2);
+    }
+    else
+    {
+        fighter2.dirX = DirectionX::NONE;
+        fighter2.dirY = DirectionY::NONE;
+    }
     updateFighter2Sprite(fighter2);
 
     sf::Vector2f movement(0.f, 0.f);
@@ -327,11 +359,25 @@ void updateFighter2(Fighter2 &fighter2, float elapsedTime)
     switch (fighter2.dirX)
     {
     case DirectionX::LEFT:
-        movement.x -= step;
+        if (fighter2Pos.x - step < 135)
+        {
+            movement.x = 0;
+        }
+        else
+        {
+            movement.x -= step;
+        }
         fighter2.animationTimer += elapsedTime;
         break;
     case DirectionX::RIGHT:
-        movement.x += step;
+        if (fighter2Pos.x + step > WINDOW_WIDTH - 135)
+        {
+            movement.x = 0;
+        }
+        else
+        {
+            movement.x += step;
+        }
         fighter2.animationTimer += elapsedTime;
         break;
     case DirectionX::NONE:

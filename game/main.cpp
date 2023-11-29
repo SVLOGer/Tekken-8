@@ -36,8 +36,8 @@ void update(sf::Clock &clock, Fighter1 &fighter1, Fighter2 &fighter2)
 {
     const float elapsedTime = clock.getElapsedTime().asSeconds();
     clock.restart();
-    updateFighter1(fighter1, elapsedTime);
-    updateFighter2(fighter2, elapsedTime);
+    updateFighter1(fighter1, elapsedTime, WINDOW_WIDTH);
+    updateFighter2(fighter2, elapsedTime, WINDOW_WIDTH);
 }
 
 // Функция рисует объекты на сцене.
