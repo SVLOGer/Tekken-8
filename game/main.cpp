@@ -1,12 +1,12 @@
 #include "fighters.h"
+#include "screen.h"
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
-// -- объявления констант --
 constexpr unsigned WINDOW_WIDTH = 1920;
 constexpr unsigned WINDOW_HEIGHT = 1080;
 constexpr unsigned MAX_FPS = 90;
 
-// Функция создаёт окно приложения.
 void createWindow(sf::RenderWindow &window)
 {
     sf::ContextSettings settings;
@@ -17,21 +17,19 @@ void createWindow(sf::RenderWindow &window)
     window.setFramerateLimit(MAX_FPS);
 }
 
-// Функция обрабатывает все события, скопившиеся в очереди событий SFML.
-void handleEvents(sf::RenderWindow &window, Fighter1 &fighter1, Fighter2 &fighter2)
+void handleEvents(sf::RenderWindow &window, Screen &screen, Fighter1 &fighter1, Fighter2 &fighter2)
 {
     sf::Event event;
     while (window.pollEvent(event))
     {
-        // Кнопка закрытия окна
         if (event.type == sf::Event::Closed)
         {
             window.close();
         }
+        updateGameState(event, screen, fighter1, fighter2);
     }
 }
 
-// Функция обновляет состояние объектов на сцене.
 void update(sf::Clock &clock, Fighter1 &fighter1, Fighter2 &fighter2)
 {
     const float elapsedTime = clock.getElapsedTime().asSeconds();
@@ -40,12 +38,36 @@ void update(sf::Clock &clock, Fighter1 &fighter1, Fighter2 &fighter2)
     updateFighter2(fighter2, elapsedTime, WINDOW_WIDTH);
 }
 
-// Функция рисует объекты на сцене.
-void render(sf::RenderWindow &window, const sf::Sprite &backgroundSprite, Fighter1 &fighter1, Fighter2 &fighter2)
+void renderStart(sf::RenderWindow &window, Screen &screen)
 {
     window.clear();
-    window.draw(backgroundSprite);
+    window.draw(screen.spriteStart);
+    window.display();
+}
+
+void renderPlay(Screen &screen, sf::RenderWindow &window, Fighter1 &fighter1, Fighter2 &fighter2)
+{
+    window.clear();
+    window.draw(screen.sprite);
     drawFighters(window, fighter1, fighter2);
+    drawFightersHpBar(screen, window, fighter1.hp, fighter2.hp, fighter1.maxhp, fighter1.maxhp);
+    window.display();
+}
+
+void renderPause(sf::RenderWindow &window, Screen &screen, Fighter1 &fighter1, Fighter2 &fighter2)
+{
+    window.clear();
+    window.draw(screen.sprite);
+    drawFighters(window, fighter1, fighter2);
+    drawFightersHpBar(screen, window, fighter1.hp, fighter2.hp, fighter1.maxhp, fighter1.maxhp);
+    window.draw(screen.spritePause);
+    window.display();
+}
+
+void renderWin(sf::RenderWindow &window, Screen &screen)
+{
+    window.clear();
+    window.draw(screen.sprite);
     window.display();
 }
 
@@ -60,21 +82,41 @@ int main(int, char *[])
     Fighter2 fighter2;
     initializeFighter2(fighter2);
 
-    sf::Texture backgroundTexture;
-    if (!backgroundTexture.loadFromFile("img/background.jpg"))
-    {
-        exit(1);
-    }
-
-    sf::Sprite backgroundSprite;
-    backgroundSprite.setTexture(backgroundTexture);
+    Screen screen;
+    initializeScreen(screen);
 
     sf::Clock clock;
+
     while (window.isOpen())
     {
-        handleEvents(window, fighter1, fighter2);
-        update(clock, fighter1, fighter2);
-        render(window, backgroundSprite, fighter1, fighter2);
+        if (screen.gameState == GameState::START)
+        {
+            handleEvents(window, screen, fighter1, fighter2);
+            renderStart(window, screen);
+        }
+        if (screen.gameState == GameState::PLAY)
+        {
+            handleEvents(window, screen, fighter1, fighter2);
+            checkAttack(fighter1, fighter2);
+            update(clock, fighter1, fighter2);
+            renderPlay(screen, window, fighter1, fighter2);
+        }
+        if (screen.gameState == GameState::PAUSE)
+        {
+            handleEvents(window, screen, fighter1, fighter2);
+            renderPause(window, screen, fighter1, fighter2);
+        }
+        if (screen.gameState == GameState::WIN)
+        {
+            handleEvents(window, screen, fighter1, fighter2);
+            renderWin(window, screen);
+        }
+        if (screen.gameState == GameState::RESTART)
+        {
+            initializeFighter1(fighter1);
+            initializeFighter2(fighter2);
+            initializeScreen(screen);
+        }
     }
 
     return 0;
